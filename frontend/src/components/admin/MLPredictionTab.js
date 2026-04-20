@@ -396,7 +396,9 @@ const MLPredictionTab = () => {
                 <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
                 <div className="relative h-full flex items-end justify-between space-x-4">
                   {predictions?.predictions?.weeklyForecast?.map((day, index) => {
-                    const maxVal = 50;
+                    const forecastValues = predictions?.predictions?.weeklyForecast?.map(d => d.predictedComplaints) || [50];
+                    const maxForecast = Math.max(...forecastValues, 10);
+                    const maxVal = maxForecast * 1.2; // Add 20% headroom
                     const height = (day.predictedComplaints / maxVal) * 100;
                     const colors = [
                       'from-blue-400 to-blue-600',

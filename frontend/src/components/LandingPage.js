@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { 
+import {
   MagnifyingGlassIcon,
   MapPinIcon,
   ChartBarIcon,
@@ -217,108 +217,106 @@ const LandingPage = () => {
                 </div>
               </div>
             </div>
-            )}
-          </div>
-        </nav>
+          )}
+        </div>
+      </nav>
 
-        {/* Enhanced Hero Section with Background Slideshow */}
-        <section className="relative h-screen overflow-hidden">
-          {/* Background Slideshow */}
-          <div className="absolute inset-0">
-            {heroImages.map((image, index) => (
-              <div
-                key={index}
-                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                  index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+      {/* Enhanced Hero Section with Background Slideshow */}
+      <section className="relative h-screen overflow-hidden">
+        {/* Background Slideshow */}
+        <div className="absolute inset-0">
+          {heroImages.map((image, index) => (
+            <div
+              key={index}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentImageIndex ? 'opacity-100' : 'opacity-0'
                 }`}
-              >
-                <img
-                  src={image.src}
-                  alt={image.title}
-                  className="w-full h-full object-cover"
-                />
-                {/* Dark overlay for text readability */}
-                <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60"></div>
-              </div>
-            ))}
-          </div>
-
-          {/* Slideshow Indicators */}
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
-            {heroImages.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentImageIndex(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === currentImageIndex
-                    ? 'bg-white w-8'
-                    : 'bg-white/50 hover:bg-white/75'
-                }`}
+            >
+              <img
+                src={image.src}
+                alt={image.title}
+                className="w-full h-full object-cover"
               />
-            ))}
-          </div>
-
-          {/* Current Image Description */}
-          <div className="absolute bottom-16 left-8 right-8 text-center z-20">
-            <div className="max-w-4xl mx-auto bg-black/30 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-              <h3 className="text-2xl font-bold text-white mb-2">
-                {heroImages[currentImageIndex].title}
-              </h3>
-              <p className="text-lg text-white/90 mb-2">
-                {heroImages[currentImageIndex].description}
-              </p>
-              <p className="text-sm text-white/80 italic">
-                {heroImages[currentImageIndex].relevance}
-              </p>
+              {/* Dark overlay for text readability */}
+              <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60"></div>
             </div>
+          ))}
+        </div>
+
+        {/* Slideshow Indicators */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
+          {heroImages.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentImageIndex(index)}
+              className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentImageIndex
+                ? 'bg-white w-8'
+                : 'bg-white/50 hover:bg-white/75'
+                }`}
+            />
+          ))}
+        </div>
+
+        {/* Current Image Description */}
+        <div className="absolute bottom-16 left-8 right-8 text-center z-20">
+          <div className="max-w-4xl mx-auto bg-black/30 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+            <h3 className="text-2xl font-bold text-white mb-2">
+              {heroImages[currentImageIndex].title}
+            </h3>
+            <p className="text-lg text-white/90 mb-2">
+              {heroImages[currentImageIndex].description}
+            </p>
+            <p className="text-sm text-white/80 italic">
+              {heroImages[currentImageIndex].relevance}
+            </p>
+          </div>
+        </div>
+
+        {/* Hero Content */}
+        <div className="relative z-20 h-full flex flex-col justify-center px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center max-w-4xl mx-auto space-y-6">
+            {/* Badge */}
+            <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-sm font-medium text-white/90 border border-white/20 shadow-lg">
+              <ShieldCheckIcon className="h-4 w-4 mr-2" />
+              Powered by Advanced AI & Machine Learning
+            </div>
+
+            {/* Main Heading */}
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight">
+              <span className="block text-white drop-shadow-lg">Community Issue</span>
+              <span className="block bg-gradient-to-r from-cyan-200 to-blue-100 bg-clip-text text-transparent drop-shadow-lg">
+                Prediction & Resolution
+              </span>
+            </h1>
+
+            {/* Subheading */}
+            <p className="text-xl md:text-2xl lg:text-3xl text-white/90 max-w-4xl mx-auto leading-relaxed drop-shadow">
+              Harness the power of AI to identify, predict, and resolve community issues
+              <span className="block font-semibold text-white drop-shadow">faster than ever before</span>
+            </p>
           </div>
 
-          {/* Hero Content */}
-          <div className="relative z-20 h-full flex flex-col justify-center px-4 sm:px-6 lg:px-8 py-8">
-            <div className="text-center max-w-4xl mx-auto space-y-6">
-              {/* Badge */}
-              <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-sm font-medium text-white/90 border border-white/20 shadow-lg">
-                <ShieldCheckIcon className="h-4 w-4 mr-2" />
-                Powered by Advanced AI & Machine Learning
-              </div>
-
-              {/* Main Heading */}
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight">
-                <span className="block text-white drop-shadow-lg">Community Issue</span>
-                <span className="block bg-gradient-to-r from-cyan-200 to-blue-100 bg-clip-text text-transparent drop-shadow-lg">
-                  Prediction & Resolution
+          {/* CTA Buttons - Moved up with reduced margin */}
+          <div className="mt-4 mb-16 text-center">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+              <Link
+                to="/register"
+                className="group relative bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-10 py-4 rounded-xl font-semibold text-lg hover:from-cyan-600 hover:to-blue-600 transition-all transform hover:scale-105 shadow-xl hover:shadow-2xl backdrop-blur-sm min-w-[160px]"
+              >
+                Raise Your Concerns
+              </Link>
+              <a
+                href="#how-it-works"
+                className="group border-2 border-white/30 text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white/10 hover:border-white/50 transition-all backdrop-blur-sm min-w-[160px]"
+              >
+                <span className="flex items-center justify-center">
+                  Learn More
+                  <ChevronDownIcon className="h-5 w-5 ml-2 group-hover:translate-y-1 transition-transform" />
                 </span>
-              </h1>
-
-              {/* Subheading */}
-              <p className="text-xl md:text-2xl lg:text-3xl text-white/90 max-w-4xl mx-auto leading-relaxed drop-shadow">
-                Harness the power of AI to identify, predict, and resolve community issues
-                <span className="block font-semibold text-white drop-shadow">faster than ever before</span>
-              </p>
-            </div>
-
-            {/* CTA Buttons - Separate container for better control */}
-            <div className="mt-8 text-center">
-              <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                <Link 
-                  to="/register" 
-                  className="group relative bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-10 py-4 rounded-xl font-semibold text-lg hover:from-cyan-600 hover:to-blue-600 transition-all transform hover:scale-105 shadow-xl hover:shadow-2xl backdrop-blur-sm min-w-[160px]"
-                >
-                  Get Started Now
-                </Link>
-                <a 
-                  href="#how-it-works" 
-                  className="group border-2 border-white/30 text-white px-10 py-4 rounded-xl font-semibold text-lg hover:bg-white/10 hover:border-white/50 transition-all backdrop-blur-sm min-w-[160px]"
-                >
-                  <span className="flex items-center justify-center">
-                    Learn More
-                    <ChevronDownIcon className="h-5 w-5 ml-2 group-hover:translate-y-1 transition-transform" />
-                  </span>
-                </a>
-              </div>
+              </a>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
       {/* Stats Section  */}
       <section className="py-16 bg-gradient-to-br from-gray-50 to-white">

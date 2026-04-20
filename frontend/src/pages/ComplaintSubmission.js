@@ -117,11 +117,11 @@ const ComplaintSubmission = () => {
       submissionData.append('title', formData.title);
       submissionData.append('description', formData.description);
       submissionData.append('category', formData.category);
-      submissionData.append('location', formData.location);
+      submissionData.append('location[address]', formData.location);
       submissionData.append('priority', formData.priority);
       
-      if (formData.latitude) submissionData.append('latitude', formData.latitude);
-      if (formData.longitude) submissionData.append('longitude', formData.longitude);
+      if (formData.latitude) submissionData.append('location[latitude]', formData.latitude);
+      if (formData.longitude) submissionData.append('location[longitude]', formData.longitude);
 
       formData.images.forEach((image, index) => {
         submissionData.append(`images`, image);

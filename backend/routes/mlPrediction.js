@@ -338,9 +338,11 @@ function generateFallbackPredictions(historicalData) {
       const date = new Date(Date.now() + i * 24 * 60 * 60 * 1000);
       const isWeekend = date.getDay() === 0 || date.getDay() === 6;
       const multiplier = isWeekend ? 0.7 : 1.2;
+      // Ensure dailyAverage is at least 15 to make bars visible in UI
+      const baseValue = Math.max(15, dailyAverage);
       return {
         date,
-        predictedComplaints: Math.round(dailyAverage * multiplier * (0.9 + Math.random() * 0.2)),
+        predictedComplaints: Math.round(baseValue * multiplier * (0.9 + Math.random() * 0.2)) || 15,
         confidence: 85 + Math.random() * 10,
         trend: Math.random() > 0.5 ? 'up' : 'down'
       };

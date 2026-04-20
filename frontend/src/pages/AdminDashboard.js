@@ -49,9 +49,23 @@ const AdminDashboard = () => {
   const [selectedTimeRange, setSelectedTimeRange] = useState('7d');
   const [activeTab, setActiveTab] = useState('overview');
   const [mlData, setMlData] = useState(null);
+  const [adminStats, setAdminStats] = useState(null);
   const [loading, setLoading] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const navigate = useNavigate();
+
+  // Helper to format time relatively
+  const formatTime = (dateString) => {
+    if (!dateString) return 'Just now';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = Math.floor((now - date) / 1000);
+
+    if (diff < 60) return 'Just now';
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    return date.toLocaleDateString();
+  };
 
   // Modern Glass Card Component
   const GlassCard = ({ children, className = "" }) => (
@@ -72,12 +86,33 @@ const AdminDashboard = () => {
       });
       const data = await response.json();
       setMlData(data);
-      setLastUpdate(new Date());
     } catch (error) {
       console.error('Error fetching ML data:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Fetch Admin Stats and Activity
+  const fetchAdminStats = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/admin/dashboard', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      setAdminStats(data);
+      setLastUpdate(new Date());
+    } catch (error) {
+      console.error('Error fetching Admin stats:', error);
+    }
+  };
+
+  const refreshAllData = () => {
+    fetchMLData();
+    fetchAdminStats();
   };
 
   useEffect(() => {
@@ -97,10 +132,10 @@ const AdminDashboard = () => {
     }
 
     setUser(user);
-    fetchMLData(); // Fetch ML data on component mount
+    refreshAllData(); // Fetch all data on component mount
 
-    // Set up auto-refresh for ML data
-    const interval = setInterval(fetchMLData, 30000); // Refresh every 30 seconds
+    // Set up auto-refresh for data
+    const interval = setInterval(refreshAllData, 30000); // Refresh every 30 seconds
     return () => clearInterval(interval);
   }, [navigate]);
 
@@ -222,7 +257,7 @@ const AdminDashboard = () => {
   const stats = [
     { 
       name: 'Total Users', 
-      value: '1,234', 
+      value: adminStats?.stats?.totalUsers?.toLocaleString() || '0', 
       icon: UsersIcon, 
       change: '+12%', 
       changeType: 'increase',
@@ -231,7 +266,7 @@ const AdminDashboard = () => {
     },
     { 
       name: 'Total Complaints', 
-      value: mlData?.currentStats?.total?.toLocaleString() || '2,456', 
+      value: adminStats?.stats?.totalComplaints?.toLocaleString() || '0', 
       icon: DocumentTextIcon, 
       change: '+8%', 
       changeType: 'increase',
@@ -239,8 +274,8 @@ const AdminDashboard = () => {
       bgColor: 'bg-green-50'
     },
     { 
-      name: 'ML Predictions', 
-      value: mlData?.currentStats?.active?.toLocaleString() || '89', 
+      name: 'ML Active Predictions', 
+      value: mlData?.currentStats?.active?.toLocaleString() || '0', 
       icon: CpuChipIcon, 
       change: '+15%', 
       changeType: 'increase',
@@ -249,7 +284,7 @@ const AdminDashboard = () => {
     },
     { 
       name: 'Resolution Rate', 
-      value: `${mlData?.currentStats?.resolutionRate || 85}%`, 
+      value: `${mlData?.currentStats?.resolutionRate || 0}%`, 
       icon: CheckCircleIcon, 
       change: '+5%', 
       changeType: 'increase',
@@ -431,13 +466,7 @@ const AdminDashboard = () => {
     { id: 5, area: 'University Area', complaints: 18, severity: 'Medium', trend: 'stable' },
   ];
 
-  const recentActivity = [
-    { id: 1, action: 'New complaint submitted', user: 'John Doe', time: '2 minutes ago', type: 'complaint' },
-    { id: 2, action: 'Hotspot detected', area: 'Downtown District', time: '15 minutes ago', type: 'hotspot' },
-    { id: 3, action: 'Complaint resolved', complaintId: 'CMP001', time: '1 hour ago', type: 'resolved' },
-    { id: 4, action: 'Critical issue escalated', severity: 'High', time: '2 hours ago', type: 'critical' },
-    { id: 5, action: 'New user registered', user: 'Jane Smith', time: '3 hours ago', type: 'user' },
-  ];
+  const recentActivityData = adminStats?.analytics?.recentActivity || [];
 
   const getTrendIcon = (trend) => {
     switch (trend) {
@@ -488,7 +517,7 @@ const AdminDashboard = () => {
               
               {/* Refresh Button */}
               <button
-                onClick={fetchMLData}
+                onClick={refreshAllData}
                 disabled={loading}
                 className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-300"
               >
@@ -735,10 +764,10 @@ const AdminDashboard = () => {
                   </h3>
                   <div className="flow-root">
                     <ul className="-mb-8">
-                      {recentActivity.map((activity, index) => (
-                        <li key={activity.id}>
+                      {recentActivityData.map((activity, index) => (
+                        <li key={activity._id || index}>
                           <div className="relative pb-8">
-                            {index !== recentActivity.length - 1 && (
+                            {index !== recentActivityData.length - 1 && (
                               <span
                                 className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
                                 aria-hidden="true"
@@ -746,30 +775,26 @@ const AdminDashboard = () => {
                             )}
                             <div className="relative flex space-x-3">
                               <div>
-                                <span className={`h-8 w-8 rounded-full flex items-center justify-center ring-4 ring-white/80 shadow-md ${activity.type === 'complaint' ? 'bg-gradient-to-r from-blue-500 to-indigo-500' :
-                                    activity.type === 'hotspot' ? 'bg-gradient-to-r from-red-500 to-orange-500' :
-                                      activity.type === 'resolved' ? 'bg-gradient-to-r from-green-500 to-emerald-500' :
-                                        activity.type === 'critical' ? 'bg-gradient-to-r from-orange-500 to-red-500' :
-                                          'bg-gradient-to-r from-purple-500 to-pink-500'
+                                <span className={`h-8 w-8 rounded-full flex items-center justify-center ring-4 ring-white/80 shadow-md ${
+                                    activity.status === 'pending' ? 'bg-gradient-to-r from-yellow-400 to-orange-500' :
+                                    activity.status === 'resolved' ? 'bg-gradient-to-r from-green-500 to-emerald-500' :
+                                    activity.priority === 'critical' ? 'bg-gradient-to-r from-red-600 to-red-800' :
+                                    'bg-gradient-to-r from-blue-500 to-indigo-500'
                                   }`}>
-                                  <span className="text-white text-xs font-bold">
-                                    {activity.type === 'complaint' ? 'C' :
-                                      activity.type === 'hotspot' ? 'H' :
-                                        activity.type === 'resolved' ? 'R' :
-                                          activity.type === 'critical' ? '!' :
-                                            'U'}
+                                  <span className="text-white text-xs font-bold uppercase">
+                                    {activity.category?.charAt(0) || 'C'}
                                   </span>
                                 </span>
                               </div>
                               <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
                                 <div>
-                                  <p className="text-sm font-semibold text-gray-900">{activity.action}</p>
-                                  <p className="text-sm text-gray-600">
-                                    {activity.user || activity.area || activity.severity}
+                                  <p className="text-sm font-semibold text-gray-900 line-clamp-1">{activity.title}</p>
+                                  <p className="text-sm text-gray-600 font-medium">
+                                    {activity.user?.name || 'Anonymous Citizen'}
                                   </p>
                                 </div>
-                                <div className="text-right text-sm whitespace-nowrap text-gray-500">
-                                  <time dateTime={activity.time}>{activity.time}</time>
+                                <div className="text-right text-xs whitespace-nowrap text-gray-400 font-bold">
+                                  <time>{formatTime(activity.createdAt)}</time>
                                 </div>
                               </div>
                             </div>

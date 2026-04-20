@@ -60,19 +60,19 @@ router.post('/', [
       .isIn(['Infrastructure', 'Sanitation', 'Water Supply', 'Electricity', 'Roads', 'Public Safety', 'Noise Pollution', 'Other'])
       .withMessage('Invalid category'),
     body('location.address').custom((value, { req }) => {
-      const address = value || req.body['location[address]'];
-      if (!address) throw new Error('Location address is required');
+      const address = value || req.body['location[address]'] || req.body.location;
+      if (!address || typeof address !== 'string') throw new Error('Location address is required');
       return true;
     }),
     body('location.latitude').custom((value, { req }) => {
-      const lat = value || req.body['location[latitude]'];
+      const lat = value || req.body['location[latitude]'] || req.body.latitude;
       if (lat === undefined || lat === '') throw new Error('Latitude is required');
       const fLat = parseFloat(lat);
       if (isNaN(fLat) || fLat < -90 || fLat > 90) throw new Error('Invalid latitude');
       return true;
     }),
     body('location.longitude').custom((value, { req }) => {
-      const lng = value || req.body['location[longitude]'];
+      const lng = value || req.body['location[longitude]'] || req.body.longitude;
       if (lng === undefined || lng === '') throw new Error('Longitude is required');
       const fLng = parseFloat(lng);
       if (isNaN(fLng) || fLng < -180 || fLng > 180) throw new Error('Invalid longitude');
@@ -110,12 +110,12 @@ router.post('/', [
 
     // Handle location parsing from FormData (multer puts nested keys as "location[address]")
     let finalLocation = {
-      address: req.body.location?.address || req.body['location[address]'],
+      address: req.body.location?.address || req.body['location[address]'] || (typeof req.body.location === 'string' ? req.body.location : ''),
       coordinates: {
-        latitude: parseFloat(req.body.location?.latitude || req.body['location[latitude]'] || 0),
-        longitude: parseFloat(req.body.location?.longitude || req.body['location[longitude]'] || 0)
+        latitude: parseFloat(req.body.location?.latitude || req.body['location[latitude]'] || req.body.latitude || 0),
+        longitude: parseFloat(req.body.location?.longitude || req.body['location[longitude]'] || req.body.longitude || 0)
       },
-      landmark: req.body.location?.landmark || req.body['location[landmark]'] || ''
+      landmark: req.body.location?.landmark || req.body['location[landmark]'] || req.body.landmark || ''
     };
 
     // Create complaint
@@ -140,7 +140,7 @@ router.post('/', [
     // Call ML service for predictions
     try {
       const mlResponse = await axios.post(`${process.env.ML_SERVICE_URL}/predict`, {
-        text: req.body.description,
+        description: req.body.description,
         category: req.body.category,
         location: {
           latitude: finalLocation.coordinates.latitude,
